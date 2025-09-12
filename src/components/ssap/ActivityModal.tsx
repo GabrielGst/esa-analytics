@@ -1,0 +1,300 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+
+// In House Components and Styles
+import { Activity } from '@/lib/types';
+import { PostApi } from '@/components/PostApi';
+import { inputsPostApi, outputsPostApi, dataPayload } from '@/lib/types';
+import { Tabs, Paper } from '@mantine/core';
+
+// @ts-ignore
+import { formatMoney } from 'accounting-js'; // Add a manual type declaration (recommended)
+
+// UI Components
+import { 
+  Stepper,
+  Button,
+  Group,
+  TextInput,
+  Textarea,
+  FileInput,
+  Checkbox,
+  Autocomplete,
+  Code,
+  Title
+ } from '@mantine/core';
+
+
+// Define contract and customers arrays for autocomplete fields.
+// To do : load the official data in these arrays.
+// To do : change autocomplete dields to controlled components to implement automatic filterings of these arrays.
+
+
+type props = {
+  data: Activity,
+  activityId: string,
+  triggerRefresh?: number,
+} & React.HTMLAttributes<HTMLDivElement>;
+
+// Define Activity Form
+// To do : implement commented validation
+function ActivityModalContent({ data, activityId, triggerRefresh, className}: props) {
+  const [slug, setSlug] = useState<string>("");
+  const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
+  const [lastRefresh, setlastRefresh] = useState<Date>();
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>();
+
+  async function refreshForm(slug: string) {
+
+    console.log("\n\n Refreshing Form values \n\n")
+
+    const dataForm = {
+      payload: {},
+      flags: {
+        slug: slug,
+        folder: "Shared Documents/SSAP/activities/" + slug,
+        listName: "SSAP_list_of_activities",
+      }
+    }
+
+    const response: outputsPostApi = await PostApi({
+      route: "refresh-app/",
+      inputData: dataForm,
+      setstatus: setStatus,
+      toastSuccessMessage: "Successfuly fetched the python API.",
+      toastErrorMessage: "Error fetching the python API.",
+      message: "Fetching related files..."
+    });
+
+    // console.log(fetchData)
+
+    const refreshTime: Date = new Date();
+    setlastRefresh(refreshTime)
+
+    if (response.status === "success") {
+      console.log("Refresh Form status : ", response.status)
+
+      const allFiles: string[] = Object.values(response.data?.files); // array of all file names
+      // const allValues: Activity = response.data?.activity[slug]; // array of all file names
+      // console.log(allFiles)
+      // console.log(allValues)
+
+      // setFilledUpValues(allValues);
+      setUploadedFiles(allFiles)
+    } else {
+      console.log("Refresh Form status : ", response.status)
+    }
+  }
+
+  // useEffect(() => {
+  //   const encodedSegment = pathname.split('/').pop(); 
+    
+  //   if (encodedSegment !== undefined) {
+  //     const decodedSegment = decodeURIComponent(encodedSegment);
+  //     setSlug(decodedSegment);
+  //   }
+  // }, [pathname, searchParams]);
+
+  useEffect(() => {
+    setSlug(activityId)
+  }, [])
+  
+  useEffect(() => {
+    if (slug) {
+      refreshForm(slug);
+    }
+  }, [slug]);
+  
+  // const [slug, setSlug] = useState<string>("");
+  // const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
+  // const [lastRefresh, setlastRefresh] = useState<Date>();
+  // const [data, setdata] = useState<Activity>();
+
+
+  // async function refreshForm(slug: string) {
+
+  //   console.log("\n\n Refreshing Form values \n\n")
+
+  //   const dataForm = {
+  //     payload: {},
+  //     flags: {
+  //       slug: slug,
+  //       folder: "Shared Documents/SSAP/activities/" + slug,
+  //       listName: "SSAP_list_of_activities",
+  //     }
+  //   }
+
+  //   const response: outputsPostApi = await PostApi({
+  //     route: "refresh-app/",
+  //     inputData: dataForm,
+  //     setstatus: setStatus,
+  //     toastSuccessMessage: "Successfuly fetched the python API.",
+  //     toastErrorMessage: "Error fetching the python API."
+  //   });
+
+  //   const refreshTime: Date = new Date();
+  //   setlastRefresh(refreshTime)
+
+  //   if (response.status === "success") {
+  //     console.log("Refresh Form status : ", response.status)
+
+  //     // const allFiles: string[] = Object.values(response.data?.files); // array of all file names
+  //     const allValues: Activity = response.data?.activity[slug]; // array of all file names
+  //     // console.log(allFiles)
+  //     // console.log(allValues)
+
+  //     setdata(allValues);
+  //   } else {
+  //     console.log("Refresh Form status : ", response.status)
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   setSlug(activityId)
+  // }, [])
+  
+  // useEffect(() => {
+  //   if (slug) {
+  //     refreshForm(slug);
+  //   }
+  // }, [slug]);
+
+  // useEffect(() => {
+  //   refreshForm(slug)
+  // }, [triggerRefresh])
+
+  return (
+    <div className={className}>
+      <div className='justify-between prose max-w-[80vw] lg:max-w-[60vw] xl:max-w-[40vw] prose-a:text-blue-600'>
+        <h1>
+          {data?.Title} : {data?.title0}
+        </h1>
+        <h2 className='mt-0'>
+          {data?.scheme} - {"Supplier Name : " + data?.supplierName}
+        </h2>
+
+        <Tabs defaultValue="description">
+          <Tabs.List>
+            <Tabs.Tab value="description">
+              Description
+            </Tabs.Tab>
+            <Tabs.Tab value="arap">
+              Annual Review Data
+            </Tabs.Tab>
+            <Tabs.Tab value="impacts">
+              Impacts
+            </Tabs.Tab>
+            <Tabs.Tab value="files">
+              Related Files
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="description">
+            {/* <p className='m-4 p-md'>
+              Description : {(data?.description ?? "Please enter a description for the activity.")}
+            </p> */}
+            <p className='m-4 p-md'>
+              Contract Number : {data?.contractNumber}
+            </p>
+            {/* <p className='m-4 p-md'>
+              Overall Amount : {formatMoney(parseFloat(data?.arap_OverallAmount ?? "Lacks data in the Annual Review"), { symbol: "€", precision: 2, thousand: ".", decimal: "," })}
+            </p> */}
+            <p className='m-4 p-md'>
+              Scheme : {data?.scheme ?? "Lacks scheme in the MP"}
+            </p>
+            <p className='m-4 p-md'>
+              Fund code : {data?.fundCode ?? "Lacks fundcode in the MP"}
+            </p>
+            <p className='m-4 p-md'>
+              {/* Really the MP here ? */}
+              Technical Officer : {data?.technicalOfficer ?? "Lacks data in the MP"}
+            </p>
+            {/* <p className='m-4 p-md'>
+              Story Author : {data?.author0 ?? "Lacks data in the MP"}
+            </p> */}
+            <p className='m-4 p-md'>
+              Esa Internal : {data?.esaInternal ?? "Default to YES"}
+            </p>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="arap">
+            <p className='m-4 p-md'>
+              ARAP Last Modification On : {new Date(data?.arap_lastModifiedOn).toLocaleString() ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Description : {data?.arap_Description ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Start of Activity : {data?.arap_StartofActivity ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              ESA Expected Due Date : {data?.arap_EED ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Overall Amount : {formatMoney(parseFloat(data?.arap_OverallAmount ?? ""), { symbol: "€", precision: 2, thousand: ".", decimal: "," }) ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Planned Start TRL : {data?.arap_PlannedStartTRL ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Planned End TRL : {data?.arap_PlannedEndTRL ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Prospect for Use : {data?.arap_ProspectforUse ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Performance of company : {data?.arap_PerformanceofCompagny ?? "Lacks data in the Annual Review"}
+            </p>
+            <p className='m-4 p-md'>
+              Note : {data?.arap_Note ?? "Lacks data in the Annual Review"}
+            </p>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="impacts">
+            <p className='m-4 p-md'>
+              Impact No 1 : {data?.impact1 ?? "Please explain the first industrial impact of this activity."}
+            </p>
+            <p className='m-4 p-md'>
+              Impact No 2 : {data?.impact2?? "Please explain an eventual second industrial impact of this activity."}
+            </p>
+            <p className='m-4 p-md'>
+              Impact No 3 : {data?.impact3 ?? "Please explain a potential third industrial impact of this activity."}
+            </p>
+          </Tabs.Panel>
+          
+          <Tabs.Panel value="files">
+            
+            <p className='m-4 p-md'>
+              Hereafters is a list of links to the uploaded files for the selected activity.
+            </p>
+            
+            <ul>
+              {
+                uploadedFiles &&
+                uploadedFiles.map((value, counter) => (
+                  <li
+                    key={counter+1}
+                  >
+                    <a
+                      href={'https://esait.sharepoint.com/sites/IndustryAnalyticsUserArea/Shared Documents/SSAP/activities/' + slug +'/' + value}
+                      target="_blank"
+                    >
+                      File {counter+1} : {value}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+
+          </Tabs.Panel>
+          
+        </Tabs>
+
+
+      </div>
+    </div>
+  );
+}
+
+export default ActivityModalContent;
