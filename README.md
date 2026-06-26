@@ -18,16 +18,15 @@ The app runs as two Docker containers (Next.js + Flask) managed by `docker compo
 ```bash
 # https://docs.docker.com/engine/install/ubuntu/
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
-sudo usermod -aG docker $USER   # allow runner user to run docker without sudo
+sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-**2. Register the GitHub Actions self-hosted runner**
-
-Go to **GitHub → repo → Settings → Actions → Runners → New self-hosted runner**, select Linux, and follow the instructions. Install the runner as a service so it survives reboots:
+**2. Clone the repo at a fixed path**
 ```bash
-sudo ./svc.sh install
-sudo ./svc.sh start
+sudo mkdir -p /opt/esa-analytics
+sudo chown $USER /opt/esa-analytics
+git clone https://github.com/GabrielGst/esa-analytics-homecenter-public.git /opt/esa-analytics
 ```
 
 **3. Create the secrets directory**
@@ -35,32 +34,45 @@ sudo ./svc.sh start
 Env files are gitignored and must be placed on the server manually:
 ```bash
 sudo mkdir -p /opt/esa-analytics-secrets
-# Copy .env.local (Next.js secrets: AUTH_URL, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, AUTH_SECRET, FLASK_INTERNAL_URL)
+# .env.local — AUTH_URL, AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, AUTH_SECRET, FLASK_INTERNAL_URL
 sudo cp .env.local /opt/esa-analytics-secrets/.env.local
-# Copy flask/.env (Flask secrets: CLIENT_ID, CLIENT_SECRET, SITE_NAME, PORT, log paths)
+# flask/.env — CLIENT_ID, CLIENT_SECRET, SITE_NAME, PORT, log paths
 sudo cp flask/.env /opt/esa-analytics-secrets/flask.env
 sudo chmod 600 /opt/esa-analytics-secrets/*
 ```
 
-**4. Migrate the existing database (first deploy only)**
+**4. Add GitHub Actions secrets**
+
+Go to **GitHub → repo → Settings → Secrets and variables → Actions** and add:
+
+| Secret | Value |
+|---|---|
+| `SERVER_HOST` | Server IP or hostname |
+| `SERVER_USER` | SSH username |
+| `SSH_PRIVATE_KEY` | Private key whose public key is in `~/.ssh/authorized_keys` on the server |
+
+**5. Migrate the existing database (first deploy only)**
 
 ```bash
+cd /opt/esa-analytics
+cp /opt/esa-analytics-secrets/.env.local .env.local
+cp /opt/esa-analytics-secrets/flask.env flask/.env
 docker compose up flask -d
 docker cp flask/instance/mydata.db esa-analytics-flask-1:/app/flask/instance/mydata.db
 docker compose restart flask
 ```
 
-**5. Configure nginx**
+**6. Configure nginx**
 
 ```bash
-sudo cp esa-analytics.webagab.fr.conf /etc/nginx/sites-available/
+sudo cp /opt/esa-analytics/esa-analytics.webagab.fr.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/esa-analytics.webagab.fr.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ### Deploying
 
-Push or merge to `public` — the Actions runner rebuilds both images and restarts the containers automatically.
+Push or merge to `public` — GitHub Actions SSHes into the server, pulls the latest code, and runs `docker compose up -d --build` automatically.
 
 ### CI on the dev branch
 
