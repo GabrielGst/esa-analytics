@@ -1,5 +1,6 @@
 services:
   flask:
+    image: ghcr.io/gabrielgst/esa-analytics-flask:latest
     build:
       context: .
       dockerfile: Dockerfile.flask
@@ -12,6 +13,7 @@ services:
     restart: unless-stopped
 
   nextjs:
+    image: ghcr.io/gabrielgst/esa-analytics-nextjs:latest
     build:
       context: .
       dockerfile: Dockerfile.nextjs
