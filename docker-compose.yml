@@ -1,0 +1,15 @@
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    env_file:
+      - flask/.env
+    environment:
+      FLASK_HOST: "0.0.0.0"
+    volumes:
+      - esa_analytics_db:/app/flask/instance
+    restart: unless-stopped
+
+volumes:
+  esa_analytics_db:

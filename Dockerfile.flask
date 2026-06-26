@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY flask/requirements.txt flask/requirements.txt
+RUN pip install --no-cache-dir -r flask/requirements.txt
+
+COPY flask/ flask/
+
+RUN mkdir -p logs flask/tmp
+
+EXPOSE 5050
+
+CMD ["python3", "flask/index.py"]

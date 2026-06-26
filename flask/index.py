@@ -581,12 +581,13 @@ def create_app():
     return app
 
 PORT = 5050
+HOST = os.environ.get('FLASK_HOST', '127.0.0.1')
 DEV_LOGS = 'logs/dev_flask-logs.log'
 PROD_LOGS = 'logs/prod_flask-logs.log'
 
 # ---- ENTRY POINT ----
 if __name__ == "__main__":
-  
+
     os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
     app = create_app()
 
@@ -599,17 +600,17 @@ if __name__ == "__main__":
         # scheduler = BackgroundScheduler()
         # job = scheduler.add_job(scheduled_authentication, 'interval', hours=6,next_run_time=datetime.now())
         # scheduler.start()
-        
-        app.run(host='127.0.0.1', port=PORT)
+
+        app.run(host=HOST, port=PORT)
     else:
         logger = setup_logging(PROD_LOGS, console_level=logging.INFO, file_level=logging.DEBUG)
         logs = PROD_LOGS
         logger.debug(sys.argv)
 
         # ctx = authenticate(CLIENT_ID, CLIENT_SECRET, SITE_NAME, logger)
-        
+
         # scheduler = BackgroundScheduler()
         # job = scheduler.add_job(scheduled_authentication, 'interval', hours=6,next_run_time=datetime.now())
         # scheduler.start()
-        
-        serve(app, host='127.0.0.1', port=PORT)
+
+        serve(app, host=HOST, port=PORT)

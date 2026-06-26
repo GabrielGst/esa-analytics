@@ -1,0 +1,11 @@
+.git
+.claude
+.next
+node_modules
+flask/.venv
+flask/instance
+flask/tmp
+logs/
+.env*
+*.md
+.DS_Store
