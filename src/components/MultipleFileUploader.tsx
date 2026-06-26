@@ -39,7 +39,7 @@ function MultipleFileUploader({ slug }: { slug: string }) {
       formData.append('slug', slug)
 
       try {
-        const result = await fetch('http://localhost:5050/flask/multiple-uploads/', {
+        const result = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
