@@ -1,0 +1,23 @@
+name: Validate Docker builds
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-flask:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Flask image
+        run: docker build -f Dockerfile.flask -t esa-flask-validate .
+
+  build-nextjs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Next.js image
+        run: docker build -f Dockerfile.nextjs -t esa-nextjs-validate .
