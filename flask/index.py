@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 import sys
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_migrate import Migrate
 from models import db, Activity, Story
@@ -127,8 +127,13 @@ def create_app():
         slug = request.form.get("slug", "")
         files = request.files.to_dict()
 
+        slug_dir = os.path.join(TMP_DIR, secure_filename(slug)) if slug else TMP_DIR
+        os.makedirs(slug_dir, exist_ok=True)
+
         tmp_size = sum(
-            e.stat().st_size for e in os.scandir(TMP_DIR) if e.is_file()
+            os.path.getsize(os.path.join(root, f))
+            for root, _, files in os.walk(TMP_DIR)
+            for f in files
         )
         if tmp_size >= MAX_TMP_BYTES:
             logger.warning("Upload rejected: tmp folder size cap reached (%d bytes)", tmp_size)
@@ -145,12 +150,33 @@ def create_app():
             if not file_name:
                 return jsonify({"status": "error", "message": "Invalid filename."}), 400
 
-            file_path = os.path.join(TMP_DIR, file_name)
+            file_path = os.path.join(slug_dir, file_name)
             file.save(file_path)
             saved.append(file_name)
-            logger.debug("Saved %s (%d bytes) for slug %s", file_name, os.path.getsize(file_path), slug)
+            logger.debug("Saved %s (%d bytes) under slug %s", file_name, os.path.getsize(file_path), slug)
 
         return jsonify({"status": "success", "message": f"Uploaded: {', '.join(saved)}."})
+
+    @app.route("/flask/files/", methods=["GET"])
+    def list_files():
+        slug = request.args.get("slug", "")
+        if not slug:
+            return jsonify({"status": "error", "message": "slug is required"}), 400
+
+        slug_dir = os.path.join(TMP_DIR, secure_filename(slug))
+        if not os.path.isdir(slug_dir):
+            return jsonify({"status": "success", "files": []})
+
+        files = [f for f in os.listdir(slug_dir) if os.path.isfile(os.path.join(slug_dir, f))]
+        return jsonify({"status": "success", "files": files})
+
+    @app.route("/flask/file/<slug>/<filename>", methods=["GET"])
+    def serve_file(slug, filename):
+        slug_dir = os.path.join(TMP_DIR, secure_filename(slug))
+        safe_name = secure_filename(filename)
+        if not safe_name:
+            return jsonify({"status": "error", "message": "Invalid filename"}), 400
+        return send_from_directory(slug_dir, safe_name)
 
     # ---- Story Routes ----
 

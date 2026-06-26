@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 
 // In House Components and Styles
 import { Activity } from '@/lib/types';
-import { PostApi } from '@/components/PostApi';
-import { inputsPostApi, outputsPostApi, dataPayload } from '@/lib/types';
 import { Tabs, Paper } from '@mantine/core';
 
 // @ts-ignore
@@ -41,49 +39,17 @@ type props = {
 // To do : implement commented validation
 function ActivityModalContent({ data, activityId, triggerRefresh, className}: props) {
   const [slug, setSlug] = useState<string>("");
-  const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
-  const [lastRefresh, setlastRefresh] = useState<Date>();
   const [uploadedFiles, setUploadedFiles] = useState<string[]>();
 
-  async function refreshForm(slug: string) {
-
-    console.log("\n\n Refreshing Form values \n\n")
-
-    const dataForm = {
-      payload: {},
-      flags: {
-        slug: slug,
-        folder: "Shared Documents/SSAP/activities/" + slug,
-        listName: "SSAP_list_of_activities",
+  async function refreshFiles(slug: string) {
+    try {
+      const res = await fetch(`/api/files?slug=${encodeURIComponent(slug)}`);
+      const data = await res.json();
+      if (data.status === 'success') {
+        setUploadedFiles(data.files);
       }
-    }
-
-    const response: outputsPostApi = await PostApi({
-      route: "refresh-app/",
-      inputData: dataForm,
-      setstatus: setStatus,
-      toastSuccessMessage: "Successfuly fetched the python API.",
-      toastErrorMessage: "Error fetching the python API.",
-      message: "Fetching related files..."
-    });
-
-    // console.log(fetchData)
-
-    const refreshTime: Date = new Date();
-    setlastRefresh(refreshTime)
-
-    if (response.status === "success") {
-      console.log("Refresh Form status : ", response.status)
-
-      const allFiles: string[] = Object.values(response.data?.files); // array of all file names
-      // const allValues: Activity = response.data?.activity[slug]; // array of all file names
-      // console.log(allFiles)
-      // console.log(allValues)
-
-      // setFilledUpValues(allValues);
-      setUploadedFiles(allFiles)
-    } else {
-      console.log("Refresh Form status : ", response.status)
+    } catch (err) {
+      console.error('Failed to fetch files:', err);
     }
   }
 
@@ -102,7 +68,7 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
   
   useEffect(() => {
     if (slug) {
-      refreshForm(slug);
+      refreshFiles(slug);
     }
   }, [slug]);
   
@@ -277,7 +243,7 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
                     key={counter+1}
                   >
                     <a
-                      href={'https://esait.sharepoint.com/sites/IndustryAnalyticsUserArea/Shared Documents/SSAP/activities/' + slug +'/' + value}
+                      href={`/api/file/${encodeURIComponent(slug)}/${encodeURIComponent(value)}`}
                       target="_blank"
                     >
                       File {counter+1} : {value}
