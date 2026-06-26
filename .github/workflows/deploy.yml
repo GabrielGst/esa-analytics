@@ -74,6 +74,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/esa-analytics
+            mkdir -p flask
             cp /opt/esa-analytics-secrets/.env.local .env.local
             cp /opt/esa-analytics-secrets/flask.env flask/.env
             docker compose pull
