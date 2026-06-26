@@ -10,6 +10,7 @@ services:
       FLASK_HOST: "0.0.0.0"
     volumes:
       - esa_analytics_db:/app/flask/instance
+      - esa_analytics_tmp:/app/flask/tmp
     restart: unless-stopped
 
   nextjs:
@@ -29,3 +30,4 @@ services:
 
 volumes:
   esa_analytics_db:
+  esa_analytics_tmp:
