@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import sys
 from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
 from flask_migrate import Migrate
 from models import db, Activity, Story
 from waitress import serve
@@ -13,12 +14,18 @@ from modules.utils import handleNextRequest
 # ---- CONFIG ----
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, "instance", "mydata.db")
+TMP_DIR = os.path.join(BASE_DIR, "tmp")
+
+ALLOWED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx", ".doc", ".xls", ".png", ".jpg", ".jpeg", ".csv"}
+MAX_REQUEST_BYTES = 16 * 1024 * 1024   # 16 MB — Flask rejects the request before it hits the route
+MAX_TMP_BYTES     = 200 * 1024 * 1024  # 200 MB — total cap on the staging folder
 
 def create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "super-secret-key"
+    app.config["MAX_CONTENT_LENGTH"] = MAX_REQUEST_BYTES
 
     db.init_app(app)
     Migrate(app, db)
@@ -111,8 +118,42 @@ def create_app():
         }
         
         
+    # ---- Upload Routes ----
+
+    @app.route("/flask/multiple-uploads/", methods=["POST"])
+    def upload_multiple_files():
+        logger.info("Route /flask/multiple-uploads/ was reached with method POST")
+
+        slug = request.form.get("slug", "")
+        files = request.files.to_dict()
+
+        tmp_size = sum(
+            e.stat().st_size for e in os.scandir(TMP_DIR) if e.is_file()
+        )
+        if tmp_size >= MAX_TMP_BYTES:
+            logger.warning("Upload rejected: tmp folder size cap reached (%d bytes)", tmp_size)
+            return jsonify({"status": "error", "message": "Upload storage is full."}), 507
+
+        saved = []
+        for key, file in files.items():
+            ext = os.path.splitext(file.filename)[1].lower()
+            if ext not in ALLOWED_EXTENSIONS:
+                logger.warning("Rejected file %s: extension not allowed", file.filename)
+                return jsonify({"status": "error", "message": f"File type '{ext}' is not allowed."}), 415
+
+            file_name = secure_filename(file.filename)
+            if not file_name:
+                return jsonify({"status": "error", "message": "Invalid filename."}), 400
+
+            file_path = os.path.join(TMP_DIR, file_name)
+            file.save(file_path)
+            saved.append(file_name)
+            logger.debug("Saved %s (%d bytes) for slug %s", file_name, os.path.getsize(file_path), slug)
+
+        return jsonify({"status": "success", "message": f"Uploaded: {', '.join(saved)}."})
+
     # ---- Story Routes ----
-    
+
     @app.route("/flask/create-story/", methods=["POST"])
     def create_story():
         logger.info("Route /flask/create-story/ was reached with method POST")
