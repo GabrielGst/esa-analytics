@@ -1,0 +1,22 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - public
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      # Env files are gitignored. They live at a fixed path on the server.
+      # See README.md → Deployment for one-time setup instructions.
+      - name: Restore env files
+        run: |
+          cp /opt/esa-analytics-secrets/.env.local .env.local
+          cp /opt/esa-analytics-secrets/flask.env flask/.env
+
+      - name: Build and restart containers
+        run: docker compose up -d --build
