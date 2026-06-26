@@ -16,7 +16,7 @@ export const POST = auth(async function POST( req: AuthenticatedRequest ) {
       // console.log('inputData:', inputData);
 
       const flaskRes = await fetch(
-        'http://127.0.0.1:5050/flask/' + route,
+        (process.env.FLASK_INTERNAL_URL ?? 'http://127.0.0.1:5050') + '/flask/' + route,
         {
           method: req.method,
           headers: {
@@ -50,7 +50,7 @@ export const GET = auth(async function GET( req: AuthenticatedRequest ) {
   if (req.auth?.user.group_membership === 'authorized') {
     try {
       const flaskRes = await fetch(
-        'http://127.0.0.1:5050/flask/healthchecker/' ,
+        (process.env.FLASK_INTERNAL_URL ?? 'http://127.0.0.1:5050') + '/flask/healthchecker/',
         {
           method: 'GET',
         })      
