@@ -2,7 +2,7 @@
 
 const nextConfig = {
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
-  allowedDevOrigins: ['esa.webagab.fr', 'https://esa.webagab.fr', 'localhost', 'http://localhost'], // 'industry-analytics-dev.go.esa.int', 'http://industry-analytics-dev.go.esa.int', 
+  allowedDevOrigins: ['esa-analytics.webagab.fr', 'https://esa-analytics.webagab.fr', 'localhost', 'http://localhost'],
   experimental: {
     mdxRs: true,
   },

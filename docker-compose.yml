@@ -11,5 +11,19 @@ services:
       - esa_analytics_db:/app/flask/instance
     restart: unless-stopped
 
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile.nextjs
+    env_file:
+      - .env.local
+    environment:
+      FLASK_INTERNAL_URL: "http://flask:5050"
+    ports:
+      - "5010:5000"
+    depends_on:
+      - flask
+    restart: unless-stopped
+
 volumes:
   esa_analytics_db:
