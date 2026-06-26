@@ -39,7 +39,20 @@ type props = {
 // To do : implement commented validation
 function ActivityModalContent({ data, activityId, triggerRefresh, className}: props) {
   const [slug, setSlug] = useState<string>("");
+  const [activityData, setActivityData] = useState<Activity>(data);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>();
+
+  async function refreshActivity(slug: string) {
+    try {
+      const res = await fetch(`/api/activity/${encodeURIComponent(slug)}`);
+      const json = await res.json();
+      if (json.status === 'success') {
+        setActivityData(json.activity);
+      }
+    } catch (err) {
+      console.error('Failed to refresh activity:', err);
+    }
+  }
 
   async function refreshFiles(slug: string) {
     try {
@@ -68,6 +81,7 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
   
   useEffect(() => {
     if (slug) {
+      refreshActivity(slug);
       refreshFiles(slug);
     }
   }, [slug]);
@@ -105,8 +119,8 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
   //   if (response.status === "success") {
   //     console.log("Refresh Form status : ", response.status)
 
-  //     // const allFiles: string[] = Object.values(response.data?.files); // array of all file names
-  //     const allValues: Activity = response.data?.activity[slug]; // array of all file names
+  //     // const allFiles: string[] = Object.values(response.activityData?.files); // array of all file names
+  //     const allValues: Activity = response.activityData?.activity[slug]; // array of all file names
   //     // console.log(allFiles)
   //     // console.log(allValues)
 
@@ -134,10 +148,10 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
     <div className={className}>
       <div className='justify-between prose max-w-[80vw] lg:max-w-[60vw] xl:max-w-[40vw] prose-a:text-blue-600'>
         <h1>
-          {data?.Title} : {data?.title0}
+          {activityData?.Title} : {activityData?.title0}
         </h1>
         <h2 className='mt-0'>
-          {data?.scheme} - {"Supplier Name : " + data?.supplierName}
+          {activityData?.scheme} - {"Supplier Name : " + activityData?.supplierName}
         </h2>
 
         <Tabs defaultValue="description">
@@ -158,74 +172,74 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
 
           <Tabs.Panel value="description">
             {/* <p className='m-4 p-md'>
-              Description : {(data?.description ?? "Please enter a description for the activity.")}
+              Description : {(activityData?.description ?? "Please enter a description for the activity.")}
             </p> */}
             <p className='m-4 p-md'>
-              Contract Number : {data?.contractNumber}
+              Contract Number : {activityData?.contractNumber}
             </p>
             {/* <p className='m-4 p-md'>
-              Overall Amount : {formatMoney(parseFloat(data?.arap_OverallAmount ?? "Lacks data in the Annual Review"), { symbol: "€", precision: 2, thousand: ".", decimal: "," })}
+              Overall Amount : {formatMoney(parseFloat(activityData?.arap_OverallAmount ?? "Lacks data in the Annual Review"), { symbol: "€", precision: 2, thousand: ".", decimal: "," })}
             </p> */}
             <p className='m-4 p-md'>
-              Scheme : {data?.scheme ?? "Lacks scheme in the MP"}
+              Scheme : {activityData?.scheme ?? "Lacks scheme in the MP"}
             </p>
             <p className='m-4 p-md'>
-              Fund code : {data?.fundCode ?? "Lacks fundcode in the MP"}
+              Fund code : {activityData?.fundCode ?? "Lacks fundcode in the MP"}
             </p>
             <p className='m-4 p-md'>
               {/* Really the MP here ? */}
-              Technical Officer : {data?.technicalOfficer ?? "Lacks data in the MP"}
+              Technical Officer : {activityData?.technicalOfficer ?? "Lacks data in the MP"}
             </p>
             {/* <p className='m-4 p-md'>
-              Story Author : {data?.author0 ?? "Lacks data in the MP"}
+              Story Author : {activityData?.author0 ?? "Lacks data in the MP"}
             </p> */}
             <p className='m-4 p-md'>
-              Esa Internal : {data?.esaInternal ?? "Default to YES"}
+              Esa Internal : {activityData?.esaInternal ?? "Default to YES"}
             </p>
           </Tabs.Panel>
 
           <Tabs.Panel value="arap">
             <p className='m-4 p-md'>
-              ARAP Last Modification On : {new Date(data?.arap_lastModifiedOn).toLocaleString() ?? "Lacks data in the Annual Review"}
+              ARAP Last Modification On : {new Date(activityData?.arap_lastModifiedOn).toLocaleString() ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Description : {data?.arap_Description ?? "Lacks data in the Annual Review"}
+              Description : {activityData?.arap_Description ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Start of Activity : {data?.arap_StartofActivity ?? "Lacks data in the Annual Review"}
+              Start of Activity : {activityData?.arap_StartofActivity ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              ESA Expected Due Date : {data?.arap_EED ?? "Lacks data in the Annual Review"}
+              ESA Expected Due Date : {activityData?.arap_EED ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Overall Amount : {formatMoney(parseFloat(data?.arap_OverallAmount ?? ""), { symbol: "€", precision: 2, thousand: ".", decimal: "," }) ?? "Lacks data in the Annual Review"}
+              Overall Amount : {formatMoney(parseFloat(activityData?.arap_OverallAmount ?? ""), { symbol: "€", precision: 2, thousand: ".", decimal: "," }) ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Planned Start TRL : {data?.arap_PlannedStartTRL ?? "Lacks data in the Annual Review"}
+              Planned Start TRL : {activityData?.arap_PlannedStartTRL ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Planned End TRL : {data?.arap_PlannedEndTRL ?? "Lacks data in the Annual Review"}
+              Planned End TRL : {activityData?.arap_PlannedEndTRL ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Prospect for Use : {data?.arap_ProspectforUse ?? "Lacks data in the Annual Review"}
+              Prospect for Use : {activityData?.arap_ProspectforUse ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Performance of company : {data?.arap_PerformanceofCompagny ?? "Lacks data in the Annual Review"}
+              Performance of company : {activityData?.arap_PerformanceofCompagny ?? "Lacks data in the Annual Review"}
             </p>
             <p className='m-4 p-md'>
-              Note : {data?.arap_Note ?? "Lacks data in the Annual Review"}
+              Note : {activityData?.arap_Note ?? "Lacks data in the Annual Review"}
             </p>
           </Tabs.Panel>
 
           <Tabs.Panel value="impacts">
             <p className='m-4 p-md'>
-              Impact No 1 : {data?.impact1 ?? "Please explain the first industrial impact of this activity."}
+              Impact No 1 : {activityData?.impact1 ?? "Please explain the first industrial impact of this activity."}
             </p>
             <p className='m-4 p-md'>
-              Impact No 2 : {data?.impact2?? "Please explain an eventual second industrial impact of this activity."}
+              Impact No 2 : {activityData?.impact2?? "Please explain an eventual second industrial impact of this activity."}
             </p>
             <p className='m-4 p-md'>
-              Impact No 3 : {data?.impact3 ?? "Please explain a potential third industrial impact of this activity."}
+              Impact No 3 : {activityData?.impact3 ?? "Please explain a potential third industrial impact of this activity."}
             </p>
           </Tabs.Panel>
           

@@ -118,6 +118,12 @@ def create_app():
         }
         
         
+    @app.route("/flask/activity/<ssap_id>", methods=["GET"])
+    def get_activity(ssap_id):
+        logger.info("Route /flask/activity/%s was reached with method GET", ssap_id)
+        activity = Activity.query.filter_by(ssapId=ssap_id).first_or_404()
+        return jsonify({"status": "success", "activity": activity.to_dict()})
+
     # ---- Upload Routes ----
 
     @app.route("/flask/multiple-uploads/", methods=["POST"])
