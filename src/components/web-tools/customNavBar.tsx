@@ -45,13 +45,13 @@ const applications: modules[] = [
 const ssapModules: modules[] = [
   {
     title: "Create Story",
-    href: "http://esa.webagab.fr/tools/success-story/activities",
+    href: "/tools/success-story/activities",
     description:
       "Browse, select activities and start your story.",
   },
   {
     title: "View Stories",
-    href: "http://esa.webagab.fr/tools/success-story/stories",
+    href: "/tools/success-story/stories",
     description:
       "Browse stories, check status, select for edition and create powerpoint.",
   },
@@ -99,7 +99,7 @@ const docModule: modules[] = [
 const arapModule: modules[] = [
   {
     title: "Annual Review Tracking",
-    href: "http://esa.webagab.fr/tools/activity-tracking",
+    href: "/tools/activity-tracking",
     description: "Generate draft annual review reports."
   }
 ]
