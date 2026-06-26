@@ -56,7 +56,7 @@ export default function CreateStoryModalField({ rowSelection } : props) {
       payload: {
         childActivities: Object.keys(rowSelection).join(","),
         storyAuthor: storyCreator,
-        storyBirth: storyBirth.toLocaleString(),
+        storyBirth: storyBirth.toISOString(),
       },
       flags: {
         storyName: value === "" ? "test" : value,

@@ -206,8 +206,8 @@ def create_app():
         # if "status" in transferData and isinstance(transferData["status"], str):
         #     transferData["status"] = datetime.fromisoformat(transferData["status"])
         if "submissionDate" in transferData and isinstance(transferData["submissionDate"], str):
-            transferData["submissionDate"] = datetime.strptime(
-                transferData["submissionDate"], "%m/%d/%Y, %I:%M:%S %p"
+            transferData["submissionDate"] = datetime.fromisoformat(
+                transferData["submissionDate"].replace("Z", "+00:00")
             )
 
         new_story = Story(**transferData)
@@ -410,8 +410,10 @@ def create_app():
         # Refresh Table values with related activities (edit-story only)
         elif (listName == 'SSAP_list_of_activities' and slug and not folder):
             logger.info("Refreshing Related-Activity table")
-            
-            item = Story.query.filter_by(ssapId=slug).first_or_404()
+
+            item = Story.query.filter_by(ssapId=slug).first()
+            if not item:
+                return jsonify({"status": "success", "message": f"Story {slug} not found.", "fetchData": {"relatedActivities": {}}}), 200
 
             childs = item.childActivities
 
@@ -424,11 +426,11 @@ def create_app():
                 logger.info(message)
 
                 for child in childs:
-                    tmp = Activity.query.filter_by(ssapId=child).first_or_404()
-                    # output[child] = tmp
-                    logging.debug(f'Tmp activity : {tmp.to_dict()}')
-                    output.update({f'{child}': tmp.to_dict()})
-            
+                    tmp = Activity.query.filter_by(ssapId=child).first()
+                    if tmp:
+                        logging.debug(f'Tmp activity : {tmp.to_dict()}')
+                        output.update({f'{child}': tmp.to_dict()})
+
             else:
                 message = f"No related activities for story {slug}."
                 logger.info(message)
@@ -459,19 +461,13 @@ def create_app():
 
             if itemType == "story":
                 logger.info("Refreshing Story form")
-                item = Story.query.filter_by(ssapId=slug).first_or_404()
-                outputData = {
-                    # "files": files,
-                    "story": item.to_dict()
-                }
+                item = Story.query.filter_by(ssapId=slug).first()
+                outputData = {"story": item.to_dict()} if item else {}
 
             elif itemType == "activity":
                 logger.info("Refreshing Activity form")
-                item = Activity.query.filter_by(ssapId=slug).first_or_404()
-                outputData = {
-                    # "files": files,
-                    "activity": item.to_dict()
-                }
+                item = Activity.query.filter_by(ssapId=slug).first()
+                outputData = {"activity": item.to_dict()} if item else {}
 
             logger.debug(outputData)
 
