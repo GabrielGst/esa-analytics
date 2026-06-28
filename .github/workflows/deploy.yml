@@ -92,4 +92,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/esa-analytics
+            timeout 60 sh -c 'until docker compose exec -T flask echo ready 2>/dev/null; do sleep 2; done'
             docker compose exec -T flask python3 -m flask db upgrade
