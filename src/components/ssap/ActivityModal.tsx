@@ -85,7 +85,14 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
       refreshFiles(slug);
     }
   }, [slug]);
-  
+
+  useEffect(() => {
+    if (slug && triggerRefresh) {
+      refreshActivity(slug);
+      refreshFiles(slug);
+    }
+  }, [triggerRefresh]);
+
   // const [slug, setSlug] = useState<string>("");
   // const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
   // const [lastRefresh, setlastRefresh] = useState<Date>();
@@ -244,24 +251,33 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
           </Tabs.Panel>
           
           <Tabs.Panel value="files">
-            
+
             <p className='m-4 p-md'>
               Hereafters is a list of links to the uploaded files for the selected activity.
             </p>
-            
+
             <ul>
               {
                 uploadedFiles &&
                 uploadedFiles.map((value, counter) => (
-                  <li
-                    key={counter+1}
-                  >
+                  <li key={counter+1} className='flex items-center gap-3 my-1'>
                     <a
                       href={`/api/file/${encodeURIComponent(slug)}/${encodeURIComponent(value)}`}
                       target="_blank"
                     >
                       File {counter+1} : {value}
                     </a>
+                    <Button
+                      size="compact-xs"
+                      color="red"
+                      variant="light"
+                      onClick={async () => {
+                        await fetch(`/api/file/${encodeURIComponent(slug)}/${encodeURIComponent(value)}`, { method: 'DELETE' });
+                        refreshFiles(slug);
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </li>
                 ))
               }

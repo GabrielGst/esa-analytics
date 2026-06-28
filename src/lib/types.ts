@@ -94,7 +94,8 @@ export type Story = {
 export type storyFormProps = {
   filledUpValues: Story | undefined,
   setFilledUpValues:(payload: SetStateAction<Story | undefined>) => void,
-  activityData: Activity[]
+  activityData: Activity[],
+  triggerRefresh?: () => void,
 }
 
 // PostApi

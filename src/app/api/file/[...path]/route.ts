@@ -39,3 +39,31 @@ export const GET = auth(async function GET(
     return NextResponse.json({ message: 'Failed to serve file' }, { status: 500 });
   }
 });
+
+export const DELETE = auth(async function DELETE(
+  req: AuthenticatedRequest,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  if (req.auth?.user.group_membership !== 'authorized') {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
+  const { path } = await params;
+  if (!path || path.length < 2) {
+    return NextResponse.json({ message: 'Invalid path' }, { status: 400 });
+  }
+
+  const [slug, filename] = path;
+
+  try {
+    const flaskRes = await fetch(
+      `${process.env.FLASK_INTERNAL_URL ?? 'http://127.0.0.1:5050'}/flask/file/${encodeURIComponent(slug)}/${encodeURIComponent(filename)}`,
+      { method: 'DELETE' }
+    );
+    const data = await flaskRes.json();
+    return NextResponse.json(data, { status: flaskRes.status });
+  } catch (err) {
+    console.error('File delete error:', err);
+    return NextResponse.json({ message: 'Failed to delete file' }, { status: 500 });
+  }
+});

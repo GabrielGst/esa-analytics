@@ -184,6 +184,19 @@ def create_app():
             return jsonify({"status": "error", "message": "Invalid filename"}), 400
         return send_from_directory(slug_dir, safe_name)
 
+    @app.route("/flask/file/<slug>/<filename>", methods=["DELETE"])
+    def delete_file(slug, filename):
+        slug_dir = os.path.join(TMP_DIR, secure_filename(slug))
+        safe_name = secure_filename(filename)
+        if not safe_name:
+            return jsonify({"status": "error", "message": "Invalid filename"}), 400
+        file_path = os.path.join(slug_dir, safe_name)
+        if not os.path.isfile(file_path):
+            return jsonify({"status": "error", "message": "File not found"}), 404
+        os.remove(file_path)
+        logger.info("Deleted file %s under slug %s", safe_name, slug)
+        return jsonify({"status": "success", "message": f"Deleted {safe_name}."})
+
     # ---- Story Routes ----
 
     @app.route("/flask/create-story/", methods=["POST"])
@@ -518,11 +531,11 @@ def create_app():
             logger.info(message)
 
 
-        res = jsonify({
+        return jsonify({
             "status": "success",
             "message": message + "Success."
             })
-        
+
     # Used by edit-story to create a new success story on the SPO (story name, ssapId and childActivities)
     @app.route("/flask/associate-activity/", methods=["POST"])
     def associateActivity():
@@ -649,7 +662,7 @@ def create_app():
 
     return app
 
-PORT = 5050
+PORT = int(os.environ.get('PORT', 5050))
 HOST = os.environ.get('FLASK_HOST', '127.0.0.1')
 DEV_LOGS = 'logs/dev_flask-logs.log'
 PROD_LOGS = 'logs/prod_flask-logs.log'

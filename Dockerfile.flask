@@ -11,4 +11,4 @@ RUN mkdir -p logs flask/tmp
 
 EXPOSE 5050
 
-CMD ["python3", "flask/index.py"]
+CMD ["sh", "-c", "python3 -m flask db upgrade && python3 flask/index.py"]
