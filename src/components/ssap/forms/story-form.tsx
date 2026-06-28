@@ -90,7 +90,8 @@ function loadInitialValues(refreshData: Story | undefined
 function StoryFormMantine({
   filledUpValues,
   setFilledUpValues,
-  activityData
+  activityData,
+  triggerRefresh,
 }: storyFormProps) {
   const [slug, setSlug] = useState<string>("");
   const [active, setActive] = useState(0);
@@ -174,7 +175,7 @@ function StoryFormMantine({
         'ssapId': row.ssapId,
         'contractNumber': row.contractNumber ?? "Lacking Contract Number",
         // 'customer': customersArray.find(str => str.startsWith(`customer_${row.ssapId}_`))?.split('_')[2] ?? "Lacking Customer Data",
-        'customer': String(Object.entries(values).find(([key]) => key === row.ssapId)?.[1]) ?? "Lacking Customer Data",
+        'customer': String(Object.entries(values).find(([key]) => key === `activity_${row.ssapId}`)?.[1]) ?? "Lacking Customer Data",
         'overallAmount': Number(row.arap_OverallAmount) ?? "Lacking Overall Amount Data",
       }
     })
@@ -232,6 +233,10 @@ function StoryFormMantine({
       toastSuccessMessage: "Successfuly fetched the python API.",
       toastErrorMessage: "Error fetching the python API."
     })
+
+    if (response.status === "success") {
+      triggerRefresh?.();
+    }
   }
 
   // async function refreshForm(slug: string) {
@@ -424,12 +429,12 @@ function StoryFormMantine({
               activityData.map((item, counter) => (
                 <Textarea
                   className='mt-3'
-                  name={`customer_${item.ssapId}`}
+                  name={`activity_${item.ssapId}`}
                   label={`Customer for <${item.Title}>`}
                   description={`Related customer for: <${item.title0}>`}
                   placeholder={`Please enter the customer for the related activity: <${item.ssapId}>`}
-                  key={form.key(item.ssapId)}
-                  {...form.getInputProps(item.ssapId)}
+                  key={form.key(`activity_${item.ssapId}`)}
+                  {...form.getInputProps(`activity_${item.ssapId}`)}
                 />
               ))
             }

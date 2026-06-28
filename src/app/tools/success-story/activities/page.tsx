@@ -93,7 +93,7 @@ export default function Home() {
     notifications.show({
       id: 'waiting-server',
       title: "Waiting to refresh...",
-      message: "Waiting for Sharepoint list to be updated...",
+      message: "Waiting for database to be updated...",
       color: "yellow",
       autoClose: false,
       loading: true,

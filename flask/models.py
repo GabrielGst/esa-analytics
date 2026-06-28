@@ -47,9 +47,6 @@ class Activity(db.Model):
     esaInternal = db.Column(db.Boolean, default=False)
     technicalOfficer = db.Column(db.String(120))
 
-    # def to_dict(self):
-    #     return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-    
     def to_dict(self):
         result = {}
         for c in self.__table__.columns:
@@ -81,6 +78,7 @@ class Story(db.Model):
     submissionDate = db.Column(db.DateTime)
     submittedBy = db.Column(db.String(120))
     lastAuthor = db.Column(db.String(120))
+    lastModifiedOn = db.Column(db.String(100))
     childActivities = db.Column(db.String(255))
 
     # Editable
@@ -102,15 +100,12 @@ class Story(db.Model):
 
     # Customers
     customers = db.Column(db.String(255))
-    # customer1 = db.Column(db.String(255))
-    # customer2 = db.Column(db.String(255))
-    # customer3 = db.Column(db.String(255))
-    # customer4 = db.Column(db.String(255))
-    # customer5 = db.Column(db.String(255))
+    customer1 = db.Column(db.String(255))
+    customer2 = db.Column(db.String(255))
+    customer3 = db.Column(db.String(255))
+    customer4 = db.Column(db.String(255))
+    customer5 = db.Column(db.String(255))
 
-    # def to_dict(self):
-    #     return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-    
     def to_dict(self):
         result = {}
         for c in self.__table__.columns:
@@ -118,4 +113,7 @@ class Story(db.Model):
             if isinstance(value, datetime):
                 value = value.isoformat()
             result[c.name] = value
+        # always compute from childActivities — stored column is stale
+        child = self.childActivities or ''
+        result['numberOfActivities'] = len([a for a in child.split(',') if a.strip()])
         return result

@@ -57,7 +57,7 @@ export default function Page() {
     notifications.show({
       id: 'waiting-server',
       title: "Waiting to refresh...",
-      message: "Waiting for Sharepoint list to be updated...",
+      message: "Waiting for database to be updated...",
       color: "yellow",
       autoClose: false,
       loading: true,
@@ -147,11 +147,24 @@ export default function Page() {
     }
   }
 
+  async function refreshStoryFiles(slug: string) {
+    try {
+      const res = await fetch(`/api/files?slug=${encodeURIComponent(slug)}`);
+      const data = await res.json();
+      if (data.status === 'success') {
+        setUploadedFiles(data.files);
+      }
+    } catch (err) {
+      console.error('Failed to fetch story files:', err);
+    }
+  }
+
   async function refresh(slug: string) {
     console.log("\n\n Refreshing table values \n\n")
     await refreshTable(slug)
     console.log("\n Refreshing Form values\n")
     await refreshForm(slug)
+    await refreshStoryFiles(slug)
   }
 
 
@@ -229,6 +242,7 @@ export default function Page() {
           filledUpValues={filledUpValues}
           setFilledUpValues={setFilledUpValues}
           activityData={tableData}
+          triggerRefresh={handleRefresh}
         />
       </div>
 
@@ -244,13 +258,24 @@ export default function Page() {
         {
           uploadedFiles &&
           uploadedFiles.map((value, counter) => (
-            <li key={counter+1} className="text-sm text-muted-foreground">
-              <a 
-                href={'https://esait.sharepoint.com/sites/IndustryAnalyticsUserArea/Shared Documents/SSAP/stories/' + propId +'/' + value}
+            <li key={counter+1} className="flex items-center gap-3 text-sm text-muted-foreground">
+              <a
+                href={`/api/file/${encodeURIComponent(propId)}/${encodeURIComponent(value)}`}
                 target="_blank"
               >
                 File {counter+1} : {value}
               </a>
+              <Button
+                size="compact-xs"
+                color="red"
+                variant="light"
+                onClick={async () => {
+                  await fetch(`/api/file/${encodeURIComponent(propId)}/${encodeURIComponent(value)}`, { method: 'DELETE' });
+                  refreshStoryFiles(propId);
+                }}
+              >
+                Delete
+              </Button>
             </li>
           ))
         }
@@ -260,9 +285,8 @@ export default function Page() {
         You can upload attachments for this story hereafters.
       </p>
 
-      
       <div className="container mx-auto py-10">
-        <MultipleFileUploader slug={propId} ></MultipleFileUploader>
+        <MultipleFileUploader slug={propId} onUploadSuccess={() => refreshStoryFiles(propId)} />
       </div>
 
 

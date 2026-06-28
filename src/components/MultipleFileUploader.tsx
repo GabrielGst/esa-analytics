@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { Button, Input } from "@mantine/core"
 import { notifications } from '@mantine/notifications';
 
-function MultipleFileUploader({ slug }: { slug: string }) {
+function MultipleFileUploader({ slug, onUploadSuccess }: { slug: string; onUploadSuccess?: () => void }) {
   // console.log("This is the slug from GetData side" + slug)
 
   const [files, setFiles] = useState<FileList | null>(null);
@@ -24,7 +24,7 @@ function MultipleFileUploader({ slug }: { slug: string }) {
     notifications.show({
       id: 'fetch-server',
       title: "Requesting server...",
-      message: "Uploading files to Sharepoint...",
+      message: "Uploading files to database...",
       color: "yellow",
       autoClose: false,
       loading: true,
@@ -51,9 +51,10 @@ function MultipleFileUploader({ slug }: { slug: string }) {
           id: 'fetch-server',
           color: 'green',
           title: "Server request success",
-          message: "Files uploaded to Sharepoint successfully !",
+          message: "Files uploaded successfully !",
           autoClose: 2000,
         })
+        onUploadSuccess?.();
         // setStatus('success');
       } catch (error) {
         console.error(error);
@@ -61,7 +62,7 @@ function MultipleFileUploader({ slug }: { slug: string }) {
           id: 'fetch-server',
           color: 'red',
           title: "Server request error",
-          message: "Error uploading files to Sharepoint",
+          message: "Error uploading files to database",
           autoClose: 2000,
         })
         // setStatus('fail');
