@@ -9,43 +9,34 @@ export default function LoginPage() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="p-10 self-center">
+    <div className="p-4 md:p-10 self-center w-full max-w-md mx-auto">
       {
-        session && (session.user?.group_membership !== 'authorized') && 
-        <div className="flex flex-col justify-center">
-          <div className="bg-black text-white p-2 mb-2 rounded-sm prose max-w-none">
+        session && (session.user?.group_membership !== 'authorized') &&
+        <div className="flex flex-col gap-3">
+          <div className="bg-black text-white p-3 rounded-sm prose max-w-none">
             <p>
-              Signed in as {session?.user?.email} with group membership {session?.user?.group_membership} since you are not member of the group CIC-IC NMS-AM-PECS.
+              Signed in as {session?.user?.email}. Your account is not part of the CIC-IC NMS-AM-PECS group.
             </p>
           </div>
-          <div className="self-center">
-            <Link href={'/home/contact'}>
-              <Button>
-                Please contact an administrator to add you to the group if relevant.
-              </Button>
-            </Link>
-          </div>
+          <Link href={'/home/contact'} className="self-center">
+            <Button>Contact an administrator</Button>
+          </Link>
         </div>
       }
 
       {
-        !session && 
-        <div className="flex flex-col justify-center">
-          <div className="bg-black text-white p-2 mb-2 rounded-sm prose max-w-none">
+        !session &&
+        <div className="flex flex-col gap-3">
+          <div className="bg-black text-white p-3 rounded-sm prose max-w-none">
             <p>
               Please sign in to access CIC-IC Automation Hub.
             </p>
           </div>
           <div className="self-center">
-            <Link href={'/home/contact'}>
-              <Button>
-                Please contact an administrator to add you to the group if relevant.
-              </Button>
-            </Link>
+            <SignIn />
           </div>
         </div>
       }
-
     </div>
   );
 }
