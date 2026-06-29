@@ -226,6 +226,7 @@ export default function Page() {
           openModalAction={() => handlersAssociateActivity.open()}
           openDrawerAction={() => handlersRow.open()}
           setActivityAction={setEditActivity}
+          onDissociated={(ids) => setTableData(prev => prev.filter(a => !ids.includes(a.ssapId)))}
         />
       </div>
 
@@ -325,7 +326,11 @@ export default function Page() {
         <p className="leading-7 [&:not(:first-child)]:mt-10">
           Please enter the ssapId for the activities. Please use "," as a separator in case you want to ass multiple activities simultaneously.
         </p>
-        <AssociateActivityModalField slug={propId} />
+        <AssociateActivityModalField
+          slug={propId}
+          onAssociated={(activities) => setTableData(prev => [...prev, ...activities])}
+          onClose={() => handlersAssociateActivity.close()}
+        />
       </CustomModal>
 
       

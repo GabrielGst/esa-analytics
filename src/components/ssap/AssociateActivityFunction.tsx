@@ -2,21 +2,21 @@ import { Textarea , CloseButton, Button } from '@mantine/core';
 import { useState } from 'react';
 
 import { PostApi } from '../PostApi';
-import { dataPayload, inputsPostApi, outputsPostApi } from '@/lib/types';
-import { SubresourceIntegrityPlugin } from 'next/dist/build/webpack/plugins/subresource-integrity-plugin';
+import { Activity, dataPayload, outputsPostApi } from '@/lib/types';
 
 type props = {
   slug: string,
+  onAssociated?: (activities: Activity[]) => void,
+  onClose?: () => void,
 }
 
 
-export default function AssociateActivityModalField({ slug } : props) {
+export default function AssociateActivityModalField({ slug, onAssociated, onClose } : props) {
   const [value, setValue] = useState('');
   const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
 
   function handleChange(changeValue: string) {
     setValue(changeValue)
-    console.log(changeValue)
   }
 
 
@@ -37,9 +37,13 @@ export default function AssociateActivityModalField({ slug } : props) {
       setstatus: setStatus,
       toastSuccessMessage: "Succesfully fetched Python API.",
       toastErrorMessage: "Error when fetching Python API.",
-      toastSuccessDescription: "When associating activity" + value,
-      toastErrorDescription : "When associating activity" + value,
     })
+
+    if (response.status === "success") {
+      const newActivities: Activity[] = (response.data as any)?.newActivities ?? [];
+      onAssociated?.(newActivities);
+      onClose?.();
+    }
   }
 
 
