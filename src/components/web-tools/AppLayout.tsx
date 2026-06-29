@@ -27,17 +27,17 @@ export default function AppLayout({
           <SessionProvider>
             <div className="w-full grid grid-cols-1 grid-rows-[80px_1fr_80px] gap-4 bg-transparent" >
               <div id='row-1' className="w-full grid grid-cols-3 md:grid-cols-5 grid-rows-1 gap-4 bg-black ">
-                <div className="flex justify-center items-center">
+                <div className="order-2 md:order-1 flex justify-center items-center">
                   <div className="prose prose-p:text-white ">
                     <p>🤖 CIC-IC Analytics</p>
                   </div>
                 </div>
 
-                <div className="col-span-1 md:col-span-3 content-center">
+                <div className="order-3 md:order-2 col-span-1 md:col-span-3 content-center">
                     <TopNavBar />
                 </div>
 
-                <div className="flex">
+                <div className="order-1 md:order-3 flex">
                   <img className="object-scale-down self-center scale-75 xl:scale-60" src="/ESA_logo_2020_White.png"></img>
                 </div>
               </div>
@@ -67,17 +67,17 @@ export default function AppLayout({
           <Notifications />
             <div className="w-full grid grid-cols-1 grid-rows-[80px_1fr_80px] gap-4">
               <div id='row-1' className="w-full grid grid-cols-3 md:grid-cols-5 grid-rows-1 gap-4 bg-black ">
-                <div className="flex justify-center items-center">
+                <div className="order-2 md:order-1 flex justify-center items-center">
                   <div className="prose prose-p:text-white ">
                     <p>🤖 CIC-IC Analytics</p>
                   </div>
                 </div>
 
-                <div className="col-span-1 md:col-span-3 content-center">
+                <div className="order-3 md:order-2 col-span-1 md:col-span-3 content-center">
                   <TopNavBar />
                 </div>
 
-                <div className="flex">
+                <div className="order-1 md:order-3 flex">
                   <img className="object-scale-down self-center scale-75 xl:scale-60" src="/ESA_logo_2020_White.png"></img>
                 </div>
               </div>
