@@ -79,9 +79,7 @@ function loadInitialValues(refreshData: Story | undefined
     console.log('Initial values :\n')
     console.log(res)
     
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(res), 2000);
-  });
+  return Promise.resolve(res);
 }
 
 
@@ -235,7 +233,9 @@ function StoryFormMantine({
     })
 
     if (response.status === "success") {
-      triggerRefresh?.();
+      if (response.data?.story) {
+        setFilledUpValues(response.data.story as Story);
+      }
     }
   }
 
