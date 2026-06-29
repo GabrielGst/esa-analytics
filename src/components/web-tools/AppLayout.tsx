@@ -26,19 +26,15 @@ export default function AppLayout({
           <Notifications />
           <SessionProvider>
             <div className="w-full grid grid-cols-1 grid-rows-[80px_1fr_80px] gap-4 bg-transparent" >
-              <div id='row-1' className="w-full grid grid-cols-5 grid-rows-1 gap-4 bg-black ">
+              <div id='row-1' className="w-full grid grid-cols-3 md:grid-cols-5 grid-rows-1 gap-4 bg-black ">
                 <div className="flex justify-center items-center">
-                  {/* <img className="object-scale-down scale-30 xl:scale-12 self-center" src="/ESA_Patch_2025.png"></img> */}
                   <div className="prose prose-p:text-white ">
                     <p>🤖 CIC-IC Analytics</p>
                   </div>
                 </div>
 
-                <div className="col-span-3 content-center">
-                  {/* <SessionProvider> */}
+                <div className="col-span-1 md:col-span-3 content-center">
                     <TopNavBar />
-                  {/* </SessionProvider> */}
-                  {/* <NavBar ></NavBar> */}
                 </div>
 
                 <div className="flex">
@@ -46,8 +42,8 @@ export default function AppLayout({
                 </div>
               </div>
 
-              <div id='row-2' className="w-full grid grid-cols-5 grid-rows-1 gap-4 pr-4 pl-4">
-                <div className="col-span-5 row-span-1 p-4 h-screen flex justify-center">
+              <div id='row-2' className="w-full grid grid-cols-1 md:grid-cols-5 grid-rows-1 gap-4 pr-4 pl-4">
+                <div className="col-span-1 md:col-span-5 row-span-1 p-4 h-screen flex justify-center">
                   {/* <SessionProvider> */}
                     {children}
                   {/* </SessionProvider> */}
@@ -70,17 +66,15 @@ export default function AppLayout({
       <MantineProvider>
           <Notifications />
             <div className="w-full grid grid-cols-1 grid-rows-[80px_1fr_80px] gap-4">
-              <div id='row-1' className="w-full grid grid-cols-5 grid-rows-1 gap-4 bg-black ">
+              <div id='row-1' className="w-full grid grid-cols-3 md:grid-cols-5 grid-rows-1 gap-4 bg-black ">
                 <div className="flex justify-center items-center">
-                  {/* <img className="object-scale-down scale-30 xl:scale-12 self-center" src="/ESA_Patch_2025.png"></img> */}
                   <div className="prose prose-p:text-white ">
                     <p>🤖 CIC-IC Analytics</p>
                   </div>
                 </div>
 
-                <div className="col-span-3 content-center">
+                <div className="col-span-1 md:col-span-3 content-center">
                   <TopNavBar />
-                  {/* <NavBar ></NavBar> */}
                 </div>
 
                 <div className="flex">
@@ -88,8 +82,8 @@ export default function AppLayout({
                 </div>
               </div>
 
-              <div id='row-2' className="w-full grid grid-cols-5 grid-rows-1 gap-4 pr-4 pl-4 bg-white">
-                <div className="col-span-5 row-span-1 p-4">
+              <div id='row-2' className="w-full grid grid-cols-1 md:grid-cols-5 grid-rows-1 gap-4 pr-4 pl-4 bg-white">
+                <div className="col-span-1 md:col-span-5 row-span-1 p-4">
                   <SessionProvider>
                     {children}
                   </SessionProvider>

@@ -36,3 +36,8 @@ export const metadata = {
     icon: '/robot_flat.svg', // /public path
   },
 };
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
