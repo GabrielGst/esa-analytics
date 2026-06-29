@@ -12,13 +12,15 @@ import { formatMoney } from 'accounting-js'; // Add a manual type declaration (r
 type props = {
   slug: string,
   storyData: Story | undefined,
-  activityData: Activity[]
+  activityData: Activity[],
+  disabled?: boolean,
 }
 
 export default function GenPptx({
   slug,
   storyData,
-  activityData
+  activityData,
+  disabled = false,
 }: props) {
 
   // const [files, setFiles] = useState<FileList | null>(null);
@@ -371,7 +373,7 @@ export default function GenPptx({
           ))
         }
       </ul> */}
-      <Button onClick={() => handleClick()}>Generate PPT</Button>
+      <Button onClick={() => handleClick()} disabled={disabled}>Generate PPT</Button>
     </>
   )
 }

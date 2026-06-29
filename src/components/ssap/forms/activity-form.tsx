@@ -31,15 +31,13 @@ function loadInitialValues(refreshData: Activity | undefined
 
   console.log("loadInitialValues inputs : \n", refreshData)
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve({
-      description: refreshData?.arap_Description === null ? '' : refreshData?.arap_Description,
-      author0: refreshData?.author0 === null ? '' : refreshData?.author0,
-      esaInternal: refreshData?.esaInternal ?? true,
-      impact1: refreshData?.impact1 === null ? '' : refreshData?.impact1,
-      impact2: refreshData?.impact2 === null ? '' : refreshData?.impact2,
-      impact3: refreshData?.impact3 === null ? '' : refreshData?.impact3,
-    }), 2000);
+  return Promise.resolve({
+    description: refreshData?.arap_Description === null ? '' : refreshData?.arap_Description,
+    author0: refreshData?.author0 === null ? '' : refreshData?.author0,
+    esaInternal: refreshData?.esaInternal ?? true,
+    impact1: refreshData?.impact1 === null ? '' : refreshData?.impact1,
+    impact2: refreshData?.impact2 === null ? '' : refreshData?.impact2,
+    impact3: refreshData?.impact3 === null ? '' : refreshData?.impact3,
   });
 }
 
@@ -48,6 +46,7 @@ type props = {
   data: Activity,
   activityId: string,
   triggerRefresh: () => void,
+  onSaved?: (activity: Activity) => void,
 } & React.HTMLAttributes<HTMLDivElement>;
 
 
@@ -57,6 +56,7 @@ function ActivityFormMantine({
   data,
   activityId,
   triggerRefresh,
+  onSaved,
   className}: props) {
 
   const [slug, setSlug] = useState<string>("");
@@ -138,8 +138,11 @@ function ActivityFormMantine({
       toastErrorMessage: "Error fetching the python API."
     })
 
+    if (response.data?.activity) {
+      onSaved?.(response.data.activity as Activity);
+    }
     triggerRefresh()
-  
+
   }
 
   useEffect(() => {

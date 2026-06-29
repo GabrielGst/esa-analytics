@@ -57,13 +57,13 @@ export default function Page() {
     notifications.show({
       id: 'waiting-server',
       title: "Waiting to refresh...",
-      message: "Waiting for database to be updated...",
+      message: "Refreshing page data...",
       color: "yellow",
       autoClose: false,
       loading: true,
     })
-    await delayRefresh(3000);
-    setRefreshKey(prev => prev + 1); // Change triggers refresh
+    await delayRefresh(300);
+    setRefreshKey(prev => prev + 1);
     notifications.update({
       id: 'waiting-server',
       color: 'green',
@@ -160,11 +160,7 @@ export default function Page() {
   }
 
   async function refresh(slug: string) {
-    console.log("\n\n Refreshing table values \n\n")
-    await refreshTable(slug)
-    console.log("\n Refreshing Form values\n")
-    await refreshForm(slug)
-    await refreshStoryFiles(slug)
+    await Promise.all([refreshTable(slug), refreshForm(slug), refreshStoryFiles(slug)])
   }
 
 
@@ -182,6 +178,12 @@ export default function Page() {
       refresh(propId);
     }
   }, [propId]);
+
+  useEffect(() => {
+    if (propId && refreshKey > 0) {
+      refresh(propId);
+    }
+  }, [refreshKey]);
 
   // useEffect(() => {
   //   console.log("\n\n Detected change in filledUpValues or uploadedFiles \n\n")
@@ -302,7 +304,7 @@ export default function Page() {
       </p>
       
       <div className="container mx-auto py-10 flex justify-center" >
-        <GenPptx slug={propId} storyData={filledUpValues} activityData={tableData} />
+        <GenPptx slug={propId} storyData={filledUpValues} activityData={tableData} disabled={!filledUpValues} />
       </div>
 
 
@@ -387,7 +389,8 @@ export default function Page() {
         <ActivityFormMantine
           data={tableData.filter(e => e.ssapId === editActivity.ssapId)[0]}
           activityId={editActivity.ssapId}
-          triggerRefresh={handleRefresh}
+          triggerRefresh={handlersDrawer.close}
+          onSaved={(updated) => setTableData(prev => prev.map(a => a.ssapId === updated.ssapId ? updated : a))}
         />
 
       </CustomDrawer>
