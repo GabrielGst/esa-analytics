@@ -1,9 +1,11 @@
 "use client"
+import { useState } from 'react';
 import SubMenu from './subMenu';
 import LoginButton from './login-button';
 import SignIn from './sign-in';
 import SignOut from './sign-out';
 import { SessionProvider } from 'next-auth/react';
+import { Burger, Drawer, NavLink } from '@mantine/core';
 
 export type modules = {
   title: string;
@@ -114,23 +116,76 @@ const menu: menuType = {
   "Applications": applications
 }
 
+export const isModulesArray = (val: any): val is modules[] => {
+  return (
+    Array.isArray(val) &&
+    val.length > 0 &&
+    typeof val[0] === 'object' &&
+    'title' in val[0] &&
+    'href' in val[0] &&
+    'description' in val[0]
+  );
+};
+
 
 export function TopNavBar() {
+  const [drawerOpened, setDrawerOpened] = useState(false);
 
   return (
     <SessionProvider>
-      <div className='flex justify-around content-center'>
-        {
-          Object.entries(menu).map(([key, value]) => {
-            return(
-              <SubMenu key={key} target={key} subMenu={value} />
-            )
-          })
-        }
+      {/* Desktop nav — hidden on small screens */}
+      <div className='hidden md:flex justify-around content-center'>
+        {Object.entries(menu).map(([key, value]) => (
+          <SubMenu key={key} target={key} subMenu={value} />
+        ))}
         <LoginButton />
-        {/* <SignIn />
-        <SignOut /> */}
       </div>
+
+      {/* Mobile burger — hidden on md+ */}
+      <div className='flex md:hidden justify-end items-center px-2'>
+        <Burger
+          opened={drawerOpened}
+          onClick={() => setDrawerOpened(o => !o)}
+          color="white"
+          aria-label="Toggle navigation"
+        />
+      </div>
+
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => setDrawerOpened(false)}
+        title="Navigation"
+        size="xs"
+        padding="md"
+      >
+        <div className="flex flex-col">
+          {Object.entries(menu).map(([key, value]) => (
+            <div key={key} className="mb-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 px-3 py-1">{key}</p>
+              {isModulesArray(value)
+                ? value.map((item) => (
+                    <a key={item.href} href={item.href} onClick={() => setDrawerOpened(false)}>
+                      <NavLink label={item.title} description={item.description} />
+                    </a>
+                  ))
+                : Object.entries(value).map(([subKey, subValue]) => (
+                    <div key={subKey} className="ml-2">
+                      <p className="text-xs text-gray-400 px-3 py-0.5">{subKey}</p>
+                      {isModulesArray(subValue) && subValue.map((item) => (
+                        <a key={item.href} href={item.href} onClick={() => setDrawerOpened(false)}>
+                          <NavLink label={item.title} description={item.description} />
+                        </a>
+                      ))}
+                    </div>
+                  ))
+              }
+            </div>
+          ))}
+          <div className="mt-4 px-3">
+            <LoginButton />
+          </div>
+        </div>
+      </Drawer>
     </SessionProvider>
   );
 }

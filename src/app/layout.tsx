@@ -11,6 +11,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="min-h-screen overflow-scroll scroll-smooth">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className="bg-[url('SolarOrbiter_BG_Logo.jpg')] bg-no-repeat bg-cover bg-center bg-fixed">
         {/* Portal target for modal */}
         <div id="modal-root" className="h-0">
