@@ -38,7 +38,8 @@ interface StoryTableProps {
   setRowSelectionAction: React.Dispatch<React.SetStateAction<MRT_RowSelectionState>>;
   openModalAction: () => void,
   openDrawerAction: () => void,
-  setActivityAction: (payload: SetStateAction<{ssapId: string, title: string}>) => void
+  setActivityAction: (payload: SetStateAction<{ssapId: string, title: string}>) => void,
+  onDissociated?: (ids: string[]) => void,
 }
 
 
@@ -49,7 +50,8 @@ export function StoryActivityTable({
   setRowSelectionAction,
   openModalAction,
   openDrawerAction,
-  setActivityAction
+  setActivityAction,
+  onDissociated,
 }: StoryTableProps) {
 
   const router = useRouter()
@@ -343,9 +345,9 @@ export function StoryActivityTable({
         })
 
         
-        if (response) {
-          console.log("Dissociated activities : ", dissociatedActivities)
-        } 
+        if (response.status === "success") {
+          onDissociated?.(dissociatedActivities);
+        }
       };
 
 

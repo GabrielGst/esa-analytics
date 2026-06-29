@@ -140,7 +140,12 @@ export default function Home() {
       </p>
 
       <div className="container mx-auto py-10">
-        <StoryTable data={tableData} setRowSelectionAction={setRowSelection} rowSelection={rowSelection} />
+        <StoryTable
+          data={tableData}
+          setRowSelectionAction={setRowSelection}
+          rowSelection={rowSelection}
+          onDeleted={(ids) => setTableData(prev => prev.filter(s => !ids.includes(s.ssapId)))}
+        />
       </div>
     </div>
   );

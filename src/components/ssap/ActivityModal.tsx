@@ -78,6 +78,10 @@ function ActivityModalContent({ data, activityId, triggerRefresh, className}: pr
   useEffect(() => {
     setSlug(activityId)
   }, [])
+
+  useEffect(() => {
+    if (data) setActivityData(data);
+  }, [data]);
   
   useEffect(() => {
     if (slug) {

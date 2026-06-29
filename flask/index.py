@@ -565,11 +565,17 @@ def create_app():
         setattr(story, 'childActivities', value)
 
         db.session.commit()
-        
-        
+
+        new_activities = []
+        for ssapId in associatedActivities:
+            act = Activity.query.filter_by(ssapId=ssapId.strip()).first()
+            if act:
+                new_activities.append(act.to_dict())
+
         res = jsonify({
             "status": "success",
-            "message": message + "Success."
+            "message": message + "Success.",
+            "fetchData": {"newActivities": new_activities}
             })
 
         return res

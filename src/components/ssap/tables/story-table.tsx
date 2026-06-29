@@ -32,13 +32,15 @@ interface StoryTableProps {
   data: Story[],
   rowSelection: rowSelection;
   setRowSelectionAction: React.Dispatch<React.SetStateAction<MRT_RowSelectionState>>;
+  onDeleted?: (ids: string[]) => void;
 }
 
 
 export function StoryTable({
   data,
   rowSelection,
-  setRowSelectionAction
+  setRowSelectionAction,
+  onDeleted,
 }: StoryTableProps) {
 
   const router = useRouter()
@@ -293,9 +295,9 @@ export function StoryTable({
         })
 
         
-        if (response) {
-          console.log("Dissociated activities : ", deletedStories)
-        } 
+        if (response.status === "success") {
+          onDeleted?.(deletedStories);
+        }
       };
 
 
