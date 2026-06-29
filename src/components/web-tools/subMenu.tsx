@@ -1,24 +1,12 @@
 import { Menu, Button, Text } from '@mantine/core';
 import { IconSettings, IconSearch, IconPhoto, IconMessageCircle, IconTrash, IconArrowsLeftRight } from '@tabler/icons-react';
 
-import { modules, menuType } from './customNavBar';
+import { modules, menuType, isModulesArray } from './customNavBar';
 
 type props = {
   target: string,
   subMenu: modules[] | menuType,
 }
-
-
-const isModulesArray = (val: any): val is modules[] => {
-  return (
-    Array.isArray(val) &&
-    val.length > 0 &&
-    typeof val[0] === 'object' &&
-    'title' in val[0] &&
-    'href' in val[0] &&
-    'description' in val[0]
-  );
-};
 
 
 export default function SubMenu({
