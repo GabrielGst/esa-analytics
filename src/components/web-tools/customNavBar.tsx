@@ -66,35 +66,9 @@ const homeModule: modules[] = [
     description: "This is the homecenter of automation application of CIC-IC division.",
   },
   {
-    title: "News",
-    href: "/home/news",
-    description: "News from dev team : features, updates",
-  },
-  {
     title: "Contact",
     href: "/home/contact",
-    description: "If you ran into an issue, we welcome any feedback !",    
-  },
-]
-
-const docModule: modules[] = [
-  {
-    // icon: IconBook,
-    title: "Doc - Developpers",
-    href: "/documentation/developpers/",
-    description: "Implementing new tools, fixing bugs in existing ones",    
-  },
-  {
-    // icon: IconBook,
-    title: "Doc - Training Material",
-    href: "/documentation/training/",
-    description: "External/Delegation focused taining material",    
-  },
-  {
-    // icon: IconBook,
-    title: "Doc - Automated Tools Manual",
-    href: "/documentation/training-tools/",
-    description: "Learn how to use current tools to your advantage",    
+    description: "If you ran into an issue, we welcome any feedback !",
   },
 ]
 
@@ -107,13 +81,9 @@ const arapModule: modules[] = [
 ]
 
 const menu: menuType = {
-  "Home": {
-    "Home": homeModule,
-    "Documentations": docModule,
-  },
+  "Home": homeModule,
   "Success Story App": ssapModules,
   "Annual Review Tracking": arapModule,
-  "Applications": applications
 }
 
 export const isModulesArray = (val: any): val is modules[] => {

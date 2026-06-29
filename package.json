@@ -1,16 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "python-dev": ". flask/.venv/bin/activate && python3 flask/index.py dev",
-    "python-prod": ". flask/.venv/bin/activate && python3 flask/index.py",
-    "next-dev": "next dev -H 127.0.0.1 -p 4000",
-    "next-prod": "next start -H 127.0.0.1 -p 4000",
     "python-init": "python3 -m venv flask/.venv && . flask/.venv/bin/activate && pip3 install -r flask/requirements.txt",
     "build": "rm -rf .next && next build",
     "init": "node scripts/init-log.js && npm run python-init && npm install && npm run build",
-    "dev": "concurrently \"npm run next-dev\" \"npm run python-dev\"",
-    "start": "concurrently \"npm run next-prod\" \"npm run python-prod\"",
-    "demo": "npm run next-dev"
+    "dev": "concurrently \"next dev -H 127.0.0.1 -p 3001\" \"PORT=5051 FLASK_HOST=127.0.0.1 flask/.venv/bin/python3 flask/index.py dev\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

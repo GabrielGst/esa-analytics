@@ -19,7 +19,7 @@ export default function Home() {
           </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 pr-24 pl-22 mt-12 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 md:pr-24 md:pl-22 mt-12 mb-12">
         <CardTool
           cover='automation_cover.jpg'
           title='Success Story Application'
