@@ -1,4 +1,4 @@
-# Automation Hub
+# Automation Hub — v1.0
 
 The Automation Hub was conceived as a central platform to consolidate all automation tools and related  raining material into a single, accessible location. At present, the ecosystem is fragmented across multiple hosting environments, with the Automation App on SharePoint, the Power BI Dashboard on Power BI, the Annual Review Portal on Power Apps, and the Success Story App already integrated into the hub itself. By centralizing these tools, the hub aims to provide a unified user experience and, with further development, could evolve into a comprehensive activity dashboard offering visibility into process timelines and activity states. In order to ensure long-term resilience, the framework has been designed with future-proofing in mind : external IT consultants have recommended shifting future development towards more flexible technologies such as React.js, enabling a more sustainable and adaptable foundation.
 
@@ -64,7 +64,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ### Deploying
 
-Push or merge to `public` — GitHub Actions SSHes into the server, pulls the latest code, and runs `docker compose up -d --build` automatically.
+Push or merge to `public` — GitHub Actions builds and pushes Docker images to GHCR, SSHes into the server, pulls the latest images, runs pending database migrations, and restarts the containers automatically.
 
 ### CI on the dev branch
 

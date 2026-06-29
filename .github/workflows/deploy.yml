@@ -82,5 +82,5 @@ jobs:
             cp /opt/esa-analytics-secrets/.env.local .env.local
             cp /opt/esa-analytics-secrets/flask.env flask/.env
             docker compose pull
-            docker compose run --rm flask sh -c "FLASK_APP=flask/index.py python3 -m flask db upgrade"
+            docker compose run --rm flask sh -c "cd /app/flask && FLASK_APP=index.py python3 -m flask db upgrade"
             docker compose up -d
